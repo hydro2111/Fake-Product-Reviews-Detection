@@ -1,4 +1,4 @@
-# AI-Based Product Review Detection System
+# ReviewGuard: An AI-Based System for Detecting Fake Product Reviews Using Machine Learning
 
 A machine learning-powered web application that detects fake reviews and analyzes sentiment using multiple AI models.
 
