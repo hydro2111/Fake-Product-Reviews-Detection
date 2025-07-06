@@ -63,7 +63,7 @@ A machine learning-powered web application that detects fake reviews and analyze
 ## File Structure
 
 - `app.py` - Main Flask application
-- `model.py` - Machine learning model definitions
+- `model.py` - Machine learning model
 - `preprocessing.py` - Text preprocessing utilities
 - `scraper.py` - Web scraping functionality
 - `templates/` - HTML templates
