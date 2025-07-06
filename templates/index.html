@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewGuard - AI-Powered Fake Review Detection</title>
+    <meta name="description" content="Detect fake reviews and analyze sentiment with advanced machine learning models">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
+                    <path d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.7 10.7 0 0 0 2.287 2.233c.346.244.652.42.893.533q.18.085.293.118a1 1 0 0 0 .101.025 1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
+                    <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>ReviewGuard</h1>
+                <h2>AI-Powered Review Analyzer</h2>
+                <p>Detect fake reviews and analyze sentiment with machine learning models. Get instant insights into product authenticity.</p>
+            </div>
+        </header>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-group" id="input-group">
+                <div class="input-wrapper">
+                    <i class="bi bi-link-45deg input-icon"></i>
+                    <input type="text" id="url-input" placeholder="Paste Product URL" aria-label="Product URL">
+                </div>
+                <select id="model-select" class="model-select" aria-label="Select AI model">
+                    <option value="svm">🤖 SVM Model (Recommended)</option>
+                    <option value="rf">🌲 Random Forest Model</option>
+                </select>
+                <button id="analyze-btn" aria-label="Analyze reviews">
+                    <i class="bi bi-search"></i>
+                    <span>Analyze Reviews</span>
+                </button>
+            </div>
+        </section>
+        
+        <!-- Error Message Container -->
+        <div id="error-container" role="alert" aria-live="polite"></div>
+
+        <!-- Loader -->
+        <div class="loader-container" id="loader" role="status" aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
+            <p id="loader-text">Initializing AI models...</p>
+            <div class="loader-steps">
+                <div class="step active">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Loading Models</span>
+                </div>
+                <div class="step">
+                    <i class="bi bi-globe"></i>
+                    <span>Scraping Reviews</span>
+                </div>
+                <div class="step">
+                    <i class="bi bi-cpu"></i>
+                    <span>AI Analysis</span>
+                </div>
+                <div class="step">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Generating Report</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" aria-live="polite">
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Summary Stats -->
+                <div class="summary-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-chat-square-text"></i>
+                        </div>
+                        <div id="total-reviews" class="value">0</div>
+                        <div class="label">Total Reviews Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon real">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div id="primary-real-reviews" class="value real">0</div>
+                        <div class="label" id="primary-real-label">Authentic Reviews</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon fake">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div id="primary-fake-reviews" class="value fake">0</div>
+                        <div class="label" id="primary-fake-label">Likely Fake Reviews</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon trust">
+                            <i class="bi bi-award"></i>
+                        </div>
+                        <div id="trust-score" class="value">0%</div>
+                        <div class="label">Trust Score</div>
+                    </div>
+                </div>
+
+                <!-- Model Comparison Stats -->
+                <div class="model-comparison">
+                    <h3><i class="bi bi-graph-up-arrow"></i> Model Performance Comparison</h3>
+                    <div class="model-stats-grid">
+                        <div class="model-stat-card">
+                            <div class="model-header">
+                                <i class="bi bi-cpu"></i>
+                                <h4>SVM Model</h4>
+                            </div>
+                            <div class="model-stat">
+                                <span class="real">
+                                    <i class="bi bi-check-circle"></i>
+                                    Authentic: <span id="svm-real-count">0</span> (<span id="svm-real-percent">0%</span>)
+                                </span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="fake">
+                                    <i class="bi bi-x-circle"></i>
+                                    Fake: <span id="svm-fake-count">0</span> (<span id="svm-fake-percent">0%</span>)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="model-stat-card">
+                            <div class="model-header">
+                                <i class="bi bi-tree"></i>
+                                <h4>Random Forest</h4>
+                            </div>
+                            <div class="model-stat">
+                                <span class="real">
+                                    <i class="bi bi-check-circle"></i>
+                                    Authentic: <span id="rf-real-count">0</span> (<span id="rf-real-percent">0%</span>)
+                                </span>
+                            </div>
+                            <div class="model-stat">
+                                <span class="fake">
+                                    <i class="bi bi-x-circle"></i>
+                                    Fake: <span id="rf-fake-count">0</span> (<span id="rf-fake-percent">0%</span>)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h4><i class="bi bi-pie-chart"></i> Review Composition</h4>
+                        <canvas id="composition-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h4><i class="bi bi-emoji-smile"></i> Sentiment Analysis</h4>
+                        <canvas id="sentiment-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Individual Reviews -->
+            <div class="reviews-section">
+                <h2 class="section-header">
+                    <i class="bi bi-list-ul"></i>
+                    Detailed Review Analysis
+                </h2>
+                <div class="reviews-controls">
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All Reviews</button>
+                        <button class="filter-btn" data-filter="real">Authentic Only</button>
+                        <button class="filter-btn" data-filter="fake">Fake Only</button>
+                    </div>
+                    <div class="sort-controls">
+                        <select id="sort-select" aria-label="Sort reviews">
+                            <option value="default">Default Order</option>
+                            <option value="rating-high">Rating: High to Low</option>
+                            <option value="rating-low">Rating: Low to High</option>
+                            <option value="sentiment">By Sentiment</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="reviews-container"></div>
+            </div>
+        </section>
+        
+        <!-- How It Works Link -->
+        <footer class="how-it-works">
+            <button id="how-it-works-btn" class="info-btn">
+                <i class="bi bi-question-circle"></i>
+                How does this work?
+            </button>
+        </footer>
+    </div>
+    
+    <!-- How it works Modal -->
+    <div id="how-it-works-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <button class="close-btn" aria-label="Close modal">&times;</button>
+            <h2 id="modal-title">
+                <i class="bi bi-gear-wide-connected"></i>
+                How The AI Analyzer Works
+            </h2>
+            <div class="modal-body">
+                <p class="modal-intro">This tool uses advanced machine learning to analyze product reviews through a sophisticated multi-step process:</p>
+                
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4><i class="bi bi-globe"></i> Web Scraping</h4>
+                            <p>Automatically fetches all available reviews from the provided product URL using intelligent web scraping technology.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4><i class="bi bi-tools"></i> Text Preprocessing</h4>
+                            <p>Each review is cleaned by removing irrelevant characters, converting emojis to text, and standardizing the format for optimal analysis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4><i class="bi bi-cpu"></i> Feature Extraction</h4>
+                            <p>Analyzes multiple features including review text (using Word2Vec embeddings), star ratings, review length, and sentiment analysis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4><i class="bi bi-robot"></i> AI Classification</h4>
+                            <p>Two advanced machine learning models (SVM and Random Forest) predict whether each review is authentic or likely computer-generated.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4><i class="bi bi-graph-up"></i> Comprehensive Analysis</h4>
+                            <p>Generates detailed statistics, interactive charts, and an overall product "Trust Score" based on authentic review sentiment.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disclaimer">
+                    <h4><i class="bi bi-exclamation-triangle"></i> Important Disclaimer</h4>
+                    <p>The predictions are based on statistical patterns and machine learning algorithms. While highly accurate, they are not 100% definitive. This tool should be used to supplement, not replace, your own judgment when making purchasing decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html> 

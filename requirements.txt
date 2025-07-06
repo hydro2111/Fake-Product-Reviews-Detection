@@ -1,0 +1,16 @@
+Flask
+Flask-Cors
+beautifulsoup4
+scikit-learn
+nltk
+requests
+word2vec
+numpy
+pandas
+langdetect
+gensim
+emoji
+joblib
+textblob
+matplotlib
+seaborn
