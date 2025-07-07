@@ -25,7 +25,7 @@ A machine learning-powered web application that detects fake reviews and analyze
 
 3. **View Results**:
    - Summary statistics show the primary model's predictions
-   - Model comparison section displays results from all models
+   - Model section displays results from the models
    - Individual review cards show detailed analysis
    - Interactive charts visualize the data
 
